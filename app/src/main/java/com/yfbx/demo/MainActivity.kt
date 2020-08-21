@@ -15,9 +15,10 @@ class MainActivity : AppCompatActivity() {
 
         webView.load(testUrl)
         webView.addScript(nightModel())
-        webView.setErrorPage { code, msg, url ->
-            //错误页面
-        }
+        webView.addScript(vipJS)
+//        webView.setErrorPage { code, msg, url ->
+//            //错误页面
+//        }
     }
 
 
