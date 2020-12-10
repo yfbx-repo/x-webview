@@ -60,7 +60,11 @@ fun XWebView.loadImage(url: String) {
  * 加载PDF
  */
 fun XWebView.loadPDF(pdfUrl: String) {
-    loadUrl("https://static.yuxiaor.com/web/viewer.html?file=$pdfUrl")
+    //使用mozilla部署在github pages上的Viewer,国内可以直接访问，但是会遇到跨域问题
+    loadUrl("http://mozilla.github.io/pdf.js/web/viewer.html?file=$pdfUrl")
+    //从 http://mozilla.github.io/pdf.js/getting_started/ 下载PDF.js and the viewer.
+    //将其部署在本地Assets中
+    loadUrl("file:///android_asset/pdf.js/web/viewer.html?file=$pdfUrl")
 }
 
 /**
