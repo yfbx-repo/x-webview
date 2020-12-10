@@ -9,4 +9,16 @@
   
   
 - 事件响应    
-  Webview 只有在调用其onResume()方法后才会响应事件(点击、缩放等)
+  Webview 只有在调用其`onResume()`方法后才会响应事件(点击、缩放等)
+
+
+# Exceptions
+
+- Using WebView from more than one process at once with the same data directory is not supported
+  Android P (9.0)不支持多个进程中共用同一 WebView 数据目录。
+  解决方法：在进程启动时(Application)，将本进程的WebView数据目录后缀设置为进程名称，以区分数据目录
+  ```
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+     WebView.setDataDirectorySuffix(Application.getProcessName())
+  }
+  ```
