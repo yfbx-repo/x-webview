@@ -3,8 +3,10 @@
 package com.yfbx.xwebview
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -30,14 +32,10 @@ class XWebView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     init {
         webViewClient = client
 
-        settings.setSupportZoom(true)
-        settings.useWideViewPort = true
-        settings.loadWithOverviewMode = true
-
         settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.SINGLE_COLUMN
         settings.domStorageEnabled = true
 
-        //允许混合模式，已解决http图片加载不出来问题
+        //允许混合模式，解决http图片加载不出来问题
         settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         settings.blockNetworkImage = false
 
@@ -52,7 +50,30 @@ class XWebView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         if (context is LifecycleOwner) {
             context.lifecycle.addObserver(this)
         }
+    }
 
+    /**
+     * Android P (9.0)
+     * 不支持多个进程中共用同一 WebView 数据目录
+     * Using WebView from more than one process at once with the same data directory is not supported
+     * 在进程启动时(Application)，将本进程的WebView数据目录后缀设置为进程名称，以区分数据目录
+     */
+    fun setWebViewDirSuffix() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            //将本进程的WebView数据目录后缀设置为进程名称
+            WebView.setDataDirectorySuffix(Application.getProcessName())
+        }
+    }
+
+    /**
+     * 是否支持缩放
+     */
+    fun setZoomEnable(enable: Boolean) {
+        settings.setSupportZoom(enable)
+        settings.useWideViewPort = enable
+        settings.loadWithOverviewMode = enable
+        settings.builtInZoomControls = enable
+        settings.displayZoomControls = false
     }
 
     /**
@@ -131,6 +152,7 @@ class XWebView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     private fun onActivityResume() {
         settings.javaScriptEnabled = true
+        onResume()
     }
 
     /**
@@ -140,6 +162,7 @@ class XWebView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     private fun onActivityStop() {
         settings.javaScriptEnabled = false
+        onPause()
     }
 
     /**
